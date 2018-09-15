@@ -44,10 +44,10 @@ Regex: \w+\.\w+\.\w+
 '''
 def get_servers(html):
     print("[*] Extracting the list...")
-    list = []
+    list = set()
     for i,tag in enumerate(html.select('td')):
         if(check_valid_server(tag.text)):
-            list.append(tag.text)
+            list.add(tag.text)
         
     return list
 
@@ -58,21 +58,28 @@ def check_valid_server(line):
 Write the list obtained to a file on the system
 '''
 def write_list_to_file(list_servers):
-    with open('servers.txt','w') as file:
-        for item in list_servers:
-            file.write("%s\n" %item)
-
-
+    file_content = set()
+    with open('servers.txt','w+') as file:
+            for line in file:
+                file_content.add(line)
+            union_sets = list_servers | file_content ## file_content.update(list_servers)
+            for item in union_sets:  
+                file.write("%s\n" %item)
 
 def main():
-    URL= "https://www.arclab.com/en/kb/email/list-of-smtp-and-pop3-servers-mailserver-list.html"
-    print("[*] Sending the request to %s" %URL)
-    html_received = content_url(URL)
-    print("[*] Valid content received, making it parsable...")
-    html_parsable = BeautifulSoup(html_received,'html.parser')
-    print("[*] Writing the list to a file...")
-    write_list_to_file(get_servers(html_parsable))
-    print("[*] Done")
+
+    sources=["https://www.arclab.com/en/kb/email/list-of-smtp-and-pop3-servers-mailserver-list.html",
+    "https://domar.com/smtp_pop3_server",
+    "http://www.e-eeasy.com/SMTPServerList.aspx"
+    ]
+    for URL in sources:
+        print("[*] Sending the request to %s" %URL)
+        html_received = content_url(URL)
+        print("[*] Valid content received, making it parsable...")
+        html_parsable = BeautifulSoup(html_received,'html.parser')
+        print("[*] Writing the list to a file...")
+        write_list_to_file(get_servers(html_parsable))
+        print("[*] Done")
     
 if __name__ == '__main__':
     main()

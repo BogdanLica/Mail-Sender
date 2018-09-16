@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  mongo:
+    image: 'mongo:4.0.2'
+    ports:
+      - '27017:27017'
+    volumes:
+      - 'mongo:/data/db'
+
+  mail-sender:
+    stdin_open: true
+    tty: true
+    depends_on:
+      - 'mongo'
+    links:
+      - 'mongo'
+    build:
+      context: ../
+      dockerfile: docker/app/Dockerfile
+    ports:
+      - '3005:3005'
+    volumes:
+      - '.:/app'
+      - 'mongo:/data'
+    environment:
+      DATABASE_URL: mongodb://mail-sender
+volumes:
+  mongo:

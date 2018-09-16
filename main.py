@@ -3,6 +3,8 @@ import re
 import socket
 import os.path
 import smtpservers_scraper
+import database
+import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -74,18 +76,27 @@ def fetch_servers():
 
 
 
+
+def save_to_db(email_user,hash_file,recipient):
+    MyDB = database.Dababase()
+
+    MyDB.craft_document(email_user,hash_file,recipient)
+
+
+    MyDB.query()
+
+    
 '''
 Main loop
 '''
 def main():
     email=""
-    password=""
     while True :
 
         email=input("E-mail: ")
         if valid_email(email):
 
-            password=input("Pass: ")
+            password=getpass.getpass("Pass: ")
 
 
             domain = extract_domain(email)
@@ -108,16 +119,15 @@ def main():
                 msg.attach(MIMEText(message))
                 server.send_message(msg)
 
-
+                hash_file = "new"
                 #server.sendmail(email,recipient,'Subject: %s\r\n%s' %(subject,message))
                 server.quit()
                 print('[*] Done')
+
+                save_to_db(email,hash_file,recipient)
+
                 break
-            #print(server)
-
-
-
-
+     
             
             
         else:

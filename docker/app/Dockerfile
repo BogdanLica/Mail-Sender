@@ -10,6 +10,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-EXPOSE 3001
+#EXPOSE 3001
 
 CMD [ "python", "main.py" ]

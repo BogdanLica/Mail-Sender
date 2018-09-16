@@ -10,5 +10,14 @@
 
 **Note:** You need to enable 'unsecure login'
 
-### TO-DO
-- [ ] attach email and password stored sately in a database
+---
+### Installation
+#### Pip
+> pip install -r requirements.txt
+> python main.py
+
+#### Docker
+* build the image from the Dockerfile
+> docker build -t mail-sender:1 -f docker/app/Dockerfile .
+* run the container
+> docker run -p 3001:999 -it mail-sender:1

@@ -17,7 +17,7 @@
 > python main.py
 
 #### Docker
-* build the image from the Dockerfile
-> docker build -t mail-sender:1 -f docker/app/Dockerfile .
-* run the container
-> docker run -p 3001:999 -it mail-sender:1
+##### Inside the **docker** folder
+> docker-compose build
+
+> docker-compose run mail-sender

@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY *.py ./
 
 COPY requirements.txt ./
-COPY servers.txt ./
+#COPY servers.txt ./
 
 RUN pip install -r requirements.txt
 

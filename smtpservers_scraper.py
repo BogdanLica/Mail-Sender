@@ -80,6 +80,8 @@ def main():
         print("[*] Writing the list to a file...")
         write_list_to_file(get_servers(html_parsable))
         print("[*] Done")
-    
+
+'''  
 if __name__ == '__main__':
     main()
+'''

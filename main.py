@@ -1,12 +1,14 @@
 import smtplib
 import re
 import socket
+import os.path
+import smtpservers_scraper
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
 '''
-Get the put the servers from a file to a list
+Put the servers from a file to a list
 '''
 def get_servers():
     list=[]
@@ -63,13 +65,24 @@ def match_domain_with_servers(domain,email,passwd):
 
     return None
 
+def fetch_servers():
+    if not os.path.exists('servers.txt'):
+        print("[*] Fetching servers...")
+        smtpservers_scraper.main()
+    else:
+        print("[*] SMTP Servers fetched")
+
+
+
 '''
 Main loop
 '''
 def main():
-    email=input("E-mail: ")
-    while "exit" not in email:
+    email=""
+    password=""
+    while True :
 
+        email=input("E-mail: ")
         if valid_email(email):
 
             password=input("Pass: ")
@@ -108,7 +121,7 @@ def main():
             
             
         else:
-            print("Invalid is invalid\n")
+            print("E-mail is invalid\n")
             email=input("E-mail: ")
 
 
@@ -117,4 +130,5 @@ def main():
 Start the main function
 '''
 if __name__ == '__main__':
-  main()
+    fetch_servers()
+    main()

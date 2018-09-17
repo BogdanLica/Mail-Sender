@@ -7,6 +7,28 @@ import database
 import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email.mime.application import MIMEApplication
+from email import encoders
+from os.path import basename
+import threading
+
+
+import handle_files
+
+
+
+def smtp_connect(domain,port):
+    smtpObj = smtplib.SMTP(domain,port,3)
+    smtpObj.starttls()
+
+    return smtpObj
+
+def reconnect(email,passwd,domain,port):
+    smtpObj = smtp_connect(domain,port)
+    smtpObj.login(email,passwd)
+
+    return smtpObj
 
 
 '''
@@ -40,26 +62,28 @@ def valid_servers(list_servers,domain):
             myList.add(server)
     return myList
 
-def match_domain_with_servers(domain,email,passwd):
+def get_server_and_port(domain,email,passwd):
     servers = get_servers()
     servers_to_check = valid_servers(servers,domain)
     
 
     ports=[25,465,587,2525,2526]
 
+    settings={}
     
 
     for server_to_check in servers_to_check:
         print("[*] Server '%s' is being checked" %server_to_check)
         for port in ports:
             try:
-                smtpObj = smtplib.SMTP(server_to_check,port,None,3)
-
-                smtpObj.starttls()
+                smtpObj = smtp_connect(server_to_check,port)
                 try:
                     if smtpObj.login(email,passwd) is not None:
                         print("Success on server '%s'" %server_to_check)
-                        return smtpObj
+                        
+                        settings['server'] = server_to_check
+                        settings['port'] = port
+                        return settings
                 except smtplib.SMTPAuthenticationError :
                     break
             except:
@@ -85,12 +109,22 @@ def save_to_db(email_user,hash_file,recipient):
 
     MyDB.query()
 
+def check_attachment(file_path,folder_path):
+    my_check = handle_files.VirusTotal()
+    result = my_check.scan_file(file_path,folder_path)
+
+
+    if result:
+        print('[*] Sorry, I cannot attach the file as it is considered malicious...')
+    else:
+        return handle_files.File_attached(file_path,folder_path).find()
     
 '''
 Main loop
 '''
 def main():
     email=""
+    settings={}
     while True :
 
         email=input("E-mail: ")
@@ -102,10 +136,10 @@ def main():
             domain = extract_domain(email)
             print("The domain is %s" %domain)
 
+            settings = get_server_and_port(domain,email,password)
+           # server = match_domain_with_servers(domain,email,password)
 
-            server = match_domain_with_servers(domain,email,password)
-
-            if server is not None:
+            if settings is not None:
                 recipient = input("Recipient: ")
                 subject = input("Subject: ")
                 message = input("Message: ")
@@ -117,9 +151,33 @@ def main():
                 msg['Subject']=subject
 
                 msg.attach(MIMEText(message))
+
+                attachment_ask=input("Do you want to add an attachment?(Y/N) ")
+
+                if attachment_ask == 'Y':
+                    file_path = input('File: ')
+                    folder_path = input('Folder: ')
+                    hash_file = handle_files.File_attached(file_path,folder_path).find()
+                    
+                    full_path = check_attachment(file_path,folder_path)
+                    
+                    if full_path is not  None:
+                        with open(full_path, "rb") as file:
+                             part = MIMEApplication(
+                             file.read(),
+                             Name=basename(full_path)
+                            )
+                        part['Content-Disposition'] = "attachment; filename= %s" % file_path
+                        
+                        msg.attach(part)
+
+
+                
+                
+                    
+                server = reconnect(email,password,settings['server'],settings['port'])
                 server.send_message(msg)
 
-                hash_file = "new"
                 #server.sendmail(email,recipient,'Subject: %s\r\n%s' %(subject,message))
                 server.quit()
                 print('[*] Done')

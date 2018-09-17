@@ -46,7 +46,7 @@ class File_attached(object):
 class VirusTotal(object):
 
     def __init__(self):
-        self.api_key="926ce5e57bcd578480e56183cdb6f013e2d17af4f72f7418f2914919cca70c5d"
+        self.api_key=""
         #self.base_url="https://www.virustotal.com/vtapi/v2/"
         self.scan_url = 'https://www.virustotal.com/vtapi/v2/file/scan'
         self.report_url = 'https://www.virustotal.com/vtapi/v2/file/report'

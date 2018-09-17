@@ -11,7 +11,11 @@
 **Note:** You need to enable 'unsecure login'
 
 ---
-### Installation
+### Installation & Usage
+
+* add an API Key for VirusTotal to **handle_files.py**
+
+
 #### Pip
 > pip install -r requirements.txt
 > python main.py
@@ -21,3 +25,5 @@
 > docker-compose build
 
 > docker-compose run mail-sender
+
+**Note:** put the files to be sent via email in the **docker/attachments** folder

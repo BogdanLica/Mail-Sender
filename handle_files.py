@@ -20,12 +20,11 @@ import requests
 import json
 import time
 class File_attached(object):
-    def __init__(self,file,folder):
+    def __init__(self,file):
         self.name = file
-        self.query_folder = folder
 
     def find(self):
-        for root,dirs,files in os.walk(self.query_folder):
+        for root,dirs,files in os.walk('/usr/src/files'):
             if self.name in files:
                 return os.path.join(root,self.name)
 
@@ -70,8 +69,8 @@ class VirusTotal(object):
     Check it too many requests were done, if so then wait
     '''
 
-    def scan_file(self,file_path,folder_path):
-        tmp = File_attached(file=file_path,folder=folder_path)
+    def scan_file(self,file_path):
+        tmp = File_attached(file=file_path)
         hash = tmp.sha256sum()
 
         response_code = ''

@@ -109,15 +109,15 @@ def save_to_db(email_user,hash_file,recipient):
 
     MyDB.query()
 
-def check_attachment(file_path,folder_path):
+def check_attachment(file_path):
     my_check = handle_files.VirusTotal()
-    result = my_check.scan_file(file_path,folder_path)
+    result = my_check.scan_file(file_path)
 
 
     if result:
         print('[*] Sorry, I cannot attach the file as it is considered malicious...')
     else:
-        return handle_files.File_attached(file_path,folder_path).find()
+        return handle_files.File_attached(file_path).find()
     
 '''
 Main loop
@@ -156,10 +156,9 @@ def main():
 
                 if attachment_ask == 'Y':
                     file_path = input('File: ')
-                    folder_path = input('Folder: ')
-                    hash_file = handle_files.File_attached(file_path,folder_path).find()
+                    hash_file = handle_files.File_attached(file_path).sha256sum()
                     
-                    full_path = check_attachment(file_path,folder_path)
+                    full_path = check_attachment(file_path)
                     
                     if full_path is not  None:
                         with open(full_path, "rb") as file:

@@ -5,6 +5,8 @@ WORKDIR /usr/src/app
 
 COPY *.py ./
 
+#COPY docker/attachments ./
+
 COPY requirements.txt ./
 #COPY servers.txt ./
 

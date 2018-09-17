@@ -23,6 +23,7 @@ services:
     volumes:
       - '.:/app'
       - 'mongo:/data'
+      - './attachments:/usr/src/files'
     environment:
       DATABASE_URL: mongodb://mail-sender
 volumes:

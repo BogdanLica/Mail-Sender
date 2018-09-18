@@ -10,7 +10,7 @@ COPY *.py ./
 COPY requirements.txt ./
 #COPY servers.txt ./
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && mkdir files
 
 #EXPOSE 3001
 

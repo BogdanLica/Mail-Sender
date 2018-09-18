@@ -1,14 +1,4 @@
 '''
-Virus total creds:
-user:
-bozub@hurify1.com
-password:
-password
-'''
-
-
-
-'''
 Take the hash of the file and search for it
 If no match then submit the file and see the response
 
@@ -24,7 +14,7 @@ class File_attached(object):
         self.name = file
 
     def find(self):
-        for root,dirs,files in os.walk('/usr/src/files'):
+        for root,dirs,files in os.walk('/usr/src/app/files'):
             if self.name in files:
                 return os.path.join(root,self.name)
 
@@ -32,6 +22,7 @@ class File_attached(object):
 
     def sha256sum(self):
         filename = self.find()
+        print('[*] The full path is %s'%(filename))
         with open(filename, 'rb') as f:
             tmp = hashlib.sha256()
             while True:
@@ -79,17 +70,21 @@ class VirusTotal(object):
         while response_code != self.response_code_successful:
 
             json_response = self.get_report(hash)
-            response_code = json_response['response_code']
+            if json_response is not None:
+
+                response_code = json_response['response_code']
 
 
-            if response_code == self.response_code_not_in_db :
-                self.unrecognised_file(tmp.find())
-                response_code = -10
-            elif response_code == self.response_code_queued_for_analysis:
-                print('[*] File queued for analysis...') 
-            elif response_code == self.response_code_unexpected_error:
-                print('[*]There was an error scanning your file...') 
-
+                if response_code == self.response_code_not_in_db :
+                    self.unrecognised_file(tmp.find())
+                    response_code = -10
+                elif response_code == self.response_code_queued_for_analysis:
+                    print('[*] File queued for analysis...') 
+                elif response_code == self.response_code_unexpected_error:
+                    print('[*]There was an error scanning your file...UNEXPECTED_ERROR') 
+            else:
+                print('[*] No file given')
+                return False
     
         #print("The response code is %s" % (response_code))
 
@@ -145,8 +140,10 @@ class VirusTotal(object):
                 print("[*] Sleeping for 60 seconds...")
 
                 time.sleep(60)
+                response = requests.get(self.report_url,params=params, headers=header)
                 
             elif response.status_code == self.HTTP_FORBIDDEN or response.status_code == self.HTTP_BAD_REQUEST:
-                print("[*] There was an error trying to scan the file")
-            response = requests.get(self.report_url,params=params, headers=header)
+                print("[*] There was an error trying to scan the file... BAD_REQUEST")
+                break
+            
         return response.json()
